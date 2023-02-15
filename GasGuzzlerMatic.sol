@@ -26,7 +26,7 @@ contract GasguzzlerMatic is ERC721EnumerableUpgradeable, OwnableUpgradeable, Non
         __ERC721_init(_name, _symbol);
         __nonblockingLzApp_init(_endpointAddress);
         stakingContract = _stakingContract;
-        gas = 250000;
+        gas = 300000;
     }
 
     function addStakingContract(address _stakingContract) external onlyOwner {
@@ -59,7 +59,7 @@ contract GasguzzlerMatic is ERC721EnumerableUpgradeable, OwnableUpgradeable, Non
         burnTokens(tokenIds);
         bytes memory payload = abi.encode(_userAddress,tokenIds);
         uint16 version = 1;
-        uint256 _gas = gas + (50000  * tokenIds.length);
+        uint256 _gas = gas * tokenIds.length;
         bytes memory adaptorParams = abi.encodePacked(version, _gas);
         (uint256 messageFees, ) = lzEndpoint.estimateFees(destinationChainId,address(this),payload,false,adaptorParams);
         require(msg.value > messageFees, 'Insufficient Amount Sent');
@@ -96,8 +96,8 @@ contract GasguzzlerMatic is ERC721EnumerableUpgradeable, OwnableUpgradeable, Non
             address(this),
             abi.encode(userAddress, tokenIds),
             false,
-            abi.encodePacked(uint16(1),uint256(gas + (50000  * tokenIds.length)))
-            );
+            abi.encodePacked(uint16(1),uint256(gas*tokenIds.length))
+        );
     }
 
     function setBaseURI(string calldata URI) external onlyOwner  {
